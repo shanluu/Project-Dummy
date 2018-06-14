@@ -1,0 +1,22 @@
+{
+  "name": "enviroment",
+  "description": "env",
+  "main": "",
+  "authors": [
+    "jeweller"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src/bower_content",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "normalize.css": "^8.0.0"
+  }
+}
