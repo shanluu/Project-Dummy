@@ -2,7 +2,7 @@
   "name": "enviroment",
   "version": "1.0.0",
   "description": "env",
-  "author": "jeweller",
+  "author": "author",
   "license": "ISC",
   "devDependencies": {
     "browser-sync": "^2.24.4",

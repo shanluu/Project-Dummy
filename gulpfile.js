@@ -1,19 +1,19 @@
 var path = {
-    build: { //Тут мы укажем куда складывать готовые после сборки файлы
+    build: { // Путь до релиза
         html: 'build/',
         js: 'build/js/',
         css: 'build/css/',
         img: 'build/img/',
         fonts: 'build/fonts/'
     },
-    src: { //Пути откуда брать исходники
-        html: 'src/*.html', //Синтаксис src/*.html говорит gulp что мы хотим взять все файлы с расширением .html
-        js: 'src/js/main.js',//В стилях и скриптах нам понадобятся только main файлы
+    src: { // Путь до исходников
+        html: 'src/*.html', 
+        js: 'src/js/main.js',
         style: 'src/style/main.scss',
-        img: 'src/img/**/*.*', //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
+        img: 'src/img/**/*.*',
         fonts: 'src/fonts/**/*.*'
     },
-    watch: { //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
+    watch: { // Что отслеживаем
         html: 'src/**/*.html',
         js: 'src/js/**/*.js',
         style: 'src/style/**/*.scss',
@@ -23,7 +23,7 @@ var path = {
     clean: './build'
 };
 
-var config = {
+var config = { // Настройка сервера
     server: {
         baseDir: "./build"
     },
@@ -33,7 +33,7 @@ var config = {
     logPrefix: "Frontend Project"
 };
 
-
+// Подключение плагинов
 var gulp          = require('gulp'),
     sass          = require('gulp-sass'),
     notify        = require('gulp-notify'),
@@ -50,57 +50,58 @@ var gulp          = require('gulp'),
     browserSync = require("browser-sync"),
     reload = browserSync.reload;
 
-    gulp.task('html:build', function () {
-        gulp.src(path.src.html) //Выберем файлы по нужному пути
-            .pipe(rigger()) //Прогоним через rigger
-            .pipe(gulp.dest(path.build.html)) //Выплюнем их в папку build
+    // Таски    
+    gulp.task('html:build', function () { // Собираем HTML
+        gulp.src(path.src.html) 
+            .pipe(rigger()) 
+            .pipe(gulp.dest(path.build.html)) 
             .pipe(reload({stream: true}));
     });
 
-    gulp.task('js:build', function () {
-        gulp.src(path.src.js) //Найдем наш main файл
-            .pipe(rigger()) //Прогоним через rigger
-            .pipe(sourcemaps.init()) //Инициализируем sourcemap
-            .pipe(uglify()) //Сожмем наш js
-            .pipe(sourcemaps.write()) //Пропишем карты
+    gulp.task('js:build', function () {// Собираем JavaScript
+        gulp.src(path.src.js) 
+            .pipe(rigger()) 
+            .pipe(sourcemaps.init()) 
+            .pipe(uglify()) 
+            .pipe(sourcemaps.write()) 
             .pipe(rename({'suffix':'.min'}))
-            .pipe(gulp.dest(path.build.js)) //Выплюнем готовый файл в build
+            .pipe(gulp.dest(path.build.js)) 
             .pipe(reload({stream: true}));
     });
 
-    gulp.task('style:build', function () {
-        gulp.src(path.src.style) //Выберем наш main.scss
-            .pipe(sourcemaps.init()) //То же самое что и с js
+    gulp.task('style:build', function () { // Собираем SASS
+        gulp.src(path.src.style) 
+            .pipe(sourcemaps.init()) 
             .pipe(sass()).on('error',notify.onError(function(error){
                 return '\n' + 'PLUG: ' + error.plugin  + '\n' + 'FILE: ' + error.file + 
                            '\n' + 'LINE: ' + error.line + '\n' + 'PROB: ' +error.message 
             }))
             .pipe(autoprefixer(['last 15 versions','> 1%','ie 8']))
-            .pipe(cssnano()) //Сожмем
+            .pipe(cssnano()) 
             .pipe(sourcemaps.write())
             .pipe(rename({'suffix':'.min'}))
-            .pipe(gulp.dest(path.build.css)) //И в build
+            .pipe(gulp.dest(path.build.css)) 
             .pipe(reload({stream: true}));
     });
 
-    gulp.task('image:build', function () {
-        gulp.src(path.src.img) //Выберем наши картинки
-            .pipe(imagemin({ //Сожмем их
+    gulp.task('image:build', function () { // Собираем изображения
+        gulp.src(path.src.img)
+            .pipe(imagemin({ 
                 progressive: true,
                 svgoPlugins: [{removeViewBox: false}],
                 use: [pngquant()],
                 interlaced: true
             }))
-            .pipe(gulp.dest(path.build.img)) //И бросим в build
+            .pipe(gulp.dest(path.build.img)) 
             .pipe(reload({stream: true}));
     });
 
-    gulp.task('fonts:build', function() {
+    gulp.task('fonts:build', function() { // Перекидываем шрифты
         gulp.src(path.src.fonts)
             .pipe(gulp.dest(path.build.fonts))
     });
 
-    gulp.task('build', [
+    gulp.task('build', [   // Полная сборка проекта
         'html:build',
         'js:build',
         'style:build',
@@ -108,11 +109,11 @@ var gulp          = require('gulp'),
         'image:build'
     ]);
 
-    gulp.task('webserver', function () {
+    gulp.task('webserver', function () {   // Запуск сервера
         browserSync(config);
     });
 
-    gulp.task('watch', function(){
+    gulp.task('watch', function(){  // Слежения за изменениями в файла
         watch([path.watch.html], function(event, cb) {
             gulp.start('html:build');
         });
@@ -130,8 +131,8 @@ var gulp          = require('gulp'),
         });
     });
 
-    gulp.task('clean', function (cb) {
+    gulp.task('clean', function (cb) { // Очистка релизной папки
         rimraf(path.clean, cb);
     });
 
-    gulp.task('default', ['build', 'webserver', 'watch']);
+    gulp.task('default', ['build', 'webserver', 'watch']); // Запуск всего для работы
